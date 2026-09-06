@@ -1,0 +1,23 @@
+-- Optional seed: import your initial catalog into Supabase.
+-- Prefer using the Admin dashboard (/admin) to add resources + PDFs.
+--
+-- Example insert (update pdf_url after uploading a file to the `pdfs` bucket):
+--
+-- insert into public.resources (
+--   title, slug, description, category, difficulty, pages, type,
+--   featured, pdf_url, tags, highlights, published, published_at
+-- ) values (
+--   'JavaScript Complete Notes',
+--   'javascript-complete-notes',
+--   'From fundamentals to advanced concepts, explained in a beginner-friendly way.',
+--   'JavaScript',
+--   'Beginner → Advanced',
+--   42,
+--   'PDF',
+--   true,
+--   'https://YOUR_PROJECT.supabase.co/storage/v1/object/public/pdfs/javascript-complete-notes.pdf',
+--   array['javascript', 'js', 'frontend', 'notes'],
+--   array['JavaScript fundamentals', 'Variables & data types', 'Functions'],
+--   true,
+--   '2026-09-01'
+-- );
