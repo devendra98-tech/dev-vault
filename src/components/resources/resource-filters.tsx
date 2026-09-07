@@ -12,15 +12,16 @@ type ResourceFiltersProps = {
   value: ResourceFiltersState;
   onChange: (value: ResourceFiltersState) => void;
   categories: string[];
+  difficulties: string[];
+  types: string[];
 };
-
-const difficulties = ["All", "Beginner", "Intermediate", "Advanced"];
-const types = ["All", "PDF", "Cheat Sheet", "Roadmap", "Guide"];
 
 export function ResourceFilters({
   value,
   onChange,
   categories,
+  difficulties,
+  types,
 }: ResourceFiltersProps) {
   return (
     <div className="space-y-5">

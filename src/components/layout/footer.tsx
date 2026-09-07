@@ -5,7 +5,6 @@ const footerLinks = [
   { href: "/resources", label: "Resources" },
   { href: "/categories", label: "Categories" },
   { href: "/about", label: "About" },
-  { href: siteConfig.instagramUrl, label: "Instagram", external: true },
 ];
 
 export function Footer() {
@@ -26,27 +25,23 @@ export function Footer() {
             className="flex flex-wrap gap-x-6 gap-y-3 lg:justify-end"
             aria-label="Footer"
           >
-            {footerLinks.map((link) =>
-              link.external ? (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </a>
-              ) : (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </Link>
-              ),
-            )}
+            {footerLinks.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <a
+              href={siteConfig.instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-accent transition-colors hover:text-foreground"
+            >
+              {siteConfig.instagramHandle}
+            </a>
           </nav>
         </div>
 

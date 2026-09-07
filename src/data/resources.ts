@@ -138,7 +138,10 @@ export async function getCategoriesWithCounts() {
     };
   });
 
-  return [...staticWithCounts, ...dynamicWithCounts];
+  // Only categories with at least one published resource
+  return [...staticWithCounts, ...dynamicWithCounts].filter(
+    (category) => category.count > 0,
+  );
 }
 
 export async function getAdminResources(): Promise<ResourceRow[]> {

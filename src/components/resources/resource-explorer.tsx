@@ -11,6 +11,8 @@ import {
 import { ResourceGrid } from "@/components/resources/resource-grid";
 import { filterResources } from "@/lib/resources/filter";
 
+const DIFFICULTY_OPTIONS = ["Beginner", "Intermediate", "Advanced"] as const;
+
 type ResourceExplorerProps = {
   resources: Resource[];
   initialQuery?: string;
@@ -44,23 +46,54 @@ export function ResourceExplorer({
     return ["All", ...unique];
   }, [resources]);
 
+  const filterDifficulties = useMemo(() => {
+    const available = DIFFICULTY_OPTIONS.filter((level) =>
+      resources.some((resource) => resource.difficulty.includes(level)),
+    );
+    return ["All", ...available];
+  }, [resources]);
+
+  const filterTypes = useMemo(() => {
+    const unique = Array.from(
+      new Set(
+        resources
+          .map((resource) => resource.type.trim())
+          .filter(Boolean),
+      ),
+    ).sort((a, b) => a.localeCompare(b));
+    return ["All", ...unique];
+  }, [resources]);
+
+  const safeFilters = useMemo(() => {
+    const category = filterCategories.includes(filters.category)
+      ? filters.category
+      : "All";
+    const difficulty = filterDifficulties.includes(filters.difficulty)
+      ? filters.difficulty
+      : "All";
+    const type = filterTypes.includes(filters.type) ? filters.type : "All";
+    return { category, difficulty, type };
+  }, [filters, filterCategories, filterDifficulties, filterTypes]);
+
   const filtered = useMemo(
     () =>
       filterResources(resources, query, {
-        category: filters.category,
-        difficulty: filters.difficulty,
-        type: filters.type,
+        category: safeFilters.category,
+        difficulty: safeFilters.difficulty,
+        type: safeFilters.type,
       }),
-    [resources, query, filters],
+    [resources, query, safeFilters],
   );
 
   return (
     <div className="space-y-8">
       <ResourceSearch value={query} onChange={setQuery} />
       <ResourceFilters
-        value={filters}
+        value={safeFilters}
         onChange={setFilters}
         categories={filterCategories}
+        difficulties={filterDifficulties}
+        types={filterTypes}
       />
       <p
         className="font-mono text-[11px] tracking-wide text-muted-foreground uppercase"

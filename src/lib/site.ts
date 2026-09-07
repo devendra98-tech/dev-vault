@@ -4,7 +4,7 @@ export const siteConfig = {
   description:
     "Developer notes, guides, cheat sheets, roadmaps and practical resources.",
   url: "https://devvault.app",
-  // Replace with your Instagram profile URL
-  instagramUrl: "https://instagram.com/yourhandle",
-  creator: "@yourhandle",
+  instagramUrl: "https://www.instagram.com/godavariabbayi_98/",
+  instagramHandle: "@godavariabbayi_98",
+  creator: "@godavariabbayi_98",
 } as const;
