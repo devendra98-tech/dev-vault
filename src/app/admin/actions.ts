@@ -7,8 +7,10 @@ import { isAdminUser } from "@/lib/auth/admin";
 import { adminErrorMessage, requireAdmin } from "@/lib/auth/require-admin";
 import { slugify } from "@/lib/utils";
 import { toResourceInsert } from "@/lib/resources/types";
-
-const MAX_PDF_BYTES = 50 * 1024 * 1024;
+import {
+  isValidPdfObjectPath,
+  PDFS_BUCKET,
+} from "@/lib/resources/pdf";
 
 function revalidatePublicSite(slug?: string) {
   revalidatePath("/", "layout");
@@ -32,17 +34,42 @@ function parseList(value: FormDataEntryValue | null): string[] {
     .filter(Boolean);
 }
 
-function validatePdfFile(file: File | null, required: boolean): string | null {
-  if (!file || file.size === 0) {
-    return required ? "A PDF file is required." : null;
+/**
+ * Accepts client-uploaded PDF metadata. The file bytes are never sent here —
+ * only path + public URL from a direct browser → Supabase Storage upload.
+ */
+function parseUploadedPdf(
+  formData: FormData,
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  required: boolean,
+): { pdfUrl: string; pdfPath: string } | { error: string } | null {
+  const pdfPath = String(formData.get("pdf_path") ?? "").trim();
+  const pdfUrl = String(formData.get("pdf_url") ?? "").trim();
+
+  if (!pdfPath && !pdfUrl) {
+    if (required) {
+      return { error: "A PDF file is required." };
+    }
+    return null;
   }
-  if (file.type !== "application/pdf") {
-    return "Only PDF files are allowed.";
+
+  if (!pdfPath || !pdfUrl) {
+    return { error: "Invalid PDF upload." };
   }
-  if (file.size > MAX_PDF_BYTES) {
-    return "PDF must be 50MB or smaller.";
+
+  if (!isValidPdfObjectPath(pdfPath)) {
+    return { error: "Invalid PDF path." };
   }
-  return null;
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from(PDFS_BUCKET).getPublicUrl(pdfPath);
+
+  if (pdfUrl !== publicUrl) {
+    return { error: "Invalid PDF URL." };
+  }
+
+  return { pdfUrl, pdfPath };
 }
 
 export async function loginAction(
@@ -57,16 +84,37 @@ export async function loginAction(
   }
 
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  let data;
+  let error;
+  try {
+    ({ data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    }));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    if (/fetch failed|ECONNRESET|ENOTFOUND|network/i.test(message)) {
+      return {
+        success: false,
+        error:
+          "Cannot reach Supabase from this machine (network/DNS). Check your connection, VPN, and that the project is active — credentials were not verified.",
+      };
+    }
+    return { success: false, error: message };
+  }
 
   if (error) {
+    if (/fetch failed|ECONNRESET|ENOTFOUND|network/i.test(error.message)) {
+      return {
+        success: false,
+        error:
+          "Cannot reach Supabase from this machine (network/DNS). Check your connection, VPN, and that the project is active — credentials were not verified.",
+      };
+    }
     return { success: false, error: error.message };
   }
 
-  if (!isAdminUser(data.user)) {
+  if (!isAdminUser(data?.user)) {
     await supabase.auth.signOut();
     return {
       success: false,
@@ -104,33 +152,20 @@ export async function createResourceAction(
     const publishedAt = String(formData.get("publishedAt") ?? "").trim();
     const tags = parseList(formData.get("tags"));
     const highlights = parseList(formData.get("highlights"));
-    const file = formData.get("pdf") as File | null;
 
     if (!title || !description || !category || !difficulty || !type || !slug) {
       return { success: false, error: "Please fill in all required fields." };
     }
 
-    const pdfError = validatePdfFile(file, true);
-    if (pdfError) {
-      return { success: false, error: pdfError };
+    const uploaded = parseUploadedPdf(formData, supabase, true);
+    if (!uploaded || "error" in uploaded) {
+      return {
+        success: false,
+        error: uploaded && "error" in uploaded ? uploaded.error : "A PDF file is required.",
+      };
     }
 
-    const pdfPath = `${slug}-${Date.now()}.pdf`;
-    const bytes = await file!.arrayBuffer();
-    const { error: uploadError } = await supabase.storage
-      .from("pdfs")
-      .upload(pdfPath, bytes, {
-        contentType: "application/pdf",
-        upsert: false,
-      });
-
-    if (uploadError) {
-      return { success: false, error: uploadError.message };
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("pdfs").getPublicUrl(pdfPath);
+    const { pdfUrl, pdfPath } = uploaded;
 
     const payload = toResourceInsert({
       title,
@@ -146,7 +181,7 @@ export async function createResourceAction(
       publishedAt: publishedAt || undefined,
       tags,
       highlights,
-      pdfUrl: publicUrl,
+      pdfUrl,
       pdfPath,
     });
 
@@ -157,7 +192,7 @@ export async function createResourceAction(
       .single();
 
     if (error) {
-      await supabase.storage.from("pdfs").remove([pdfPath]);
+      await supabase.storage.from(PDFS_BUCKET).remove([pdfPath]);
       return { success: false, error: error.message };
     }
 
@@ -207,44 +242,23 @@ export async function updateResourceAction(
     const publishedAt = String(formData.get("publishedAt") ?? "").trim();
     const tags = parseList(formData.get("tags"));
     const highlights = parseList(formData.get("highlights"));
-    const file = formData.get("pdf") as File | null;
 
     if (!title || !description || !category || !difficulty || !type || !slug) {
       return { success: false, error: "Please fill in all required fields." };
     }
 
-    const pdfError = validatePdfFile(file, false);
-    if (pdfError) {
-      return { success: false, error: pdfError };
+    const uploaded = parseUploadedPdf(formData, supabase, false);
+    if (uploaded && "error" in uploaded) {
+      return { success: false, error: uploaded.error };
     }
 
     let pdfUrl = existing.pdf_url as string;
     let pdfPath = existing.pdf_path as string | null;
+    const previousPath = pdfPath;
 
-    if (file && file.size > 0) {
-      const nextPath = `${slug}-${Date.now()}.pdf`;
-      const bytes = await file.arrayBuffer();
-      const { error: uploadError } = await supabase.storage
-        .from("pdfs")
-        .upload(nextPath, bytes, {
-          contentType: "application/pdf",
-          upsert: false,
-        });
-
-      if (uploadError) {
-        return { success: false, error: uploadError.message };
-      }
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("pdfs").getPublicUrl(nextPath);
-
-      if (pdfPath) {
-        await supabase.storage.from("pdfs").remove([pdfPath]);
-      }
-
-      pdfUrl = publicUrl;
-      pdfPath = nextPath;
+    if (uploaded) {
+      pdfUrl = uploaded.pdfUrl;
+      pdfPath = uploaded.pdfPath;
     }
 
     const payload = toResourceInsert({
@@ -271,7 +285,14 @@ export async function updateResourceAction(
       .eq("id", id);
 
     if (error) {
+      if (uploaded) {
+        await supabase.storage.from(PDFS_BUCKET).remove([uploaded.pdfPath]);
+      }
       return { success: false, error: error.message };
+    }
+
+    if (uploaded && previousPath && previousPath !== uploaded.pdfPath) {
+      await supabase.storage.from(PDFS_BUCKET).remove([previousPath]);
     }
 
     revalidatePublicSite(slug);
@@ -302,7 +323,7 @@ export async function deleteResourceAction(formData: FormData): Promise<void> {
 
     const { error } = await supabase.from("resources").delete().eq("id", id);
     if (!error && existing?.pdf_path) {
-      await supabase.storage.from("pdfs").remove([existing.pdf_path]);
+      await supabase.storage.from(PDFS_BUCKET).remove([existing.pdf_path]);
     }
 
     if (existing?.slug) {

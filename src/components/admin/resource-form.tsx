@@ -8,6 +8,13 @@ import {
   type ActionResult,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
+import { isAdminUser } from "@/lib/auth/admin";
+import {
+  buildPdfObjectPath,
+  PDFS_BUCKET,
+  validatePdfFile,
+} from "@/lib/resources/pdf";
+import { createClient } from "@/lib/supabase/client";
 import { slugify } from "@/lib/utils";
 import type { ResourceRow } from "@/lib/resources/types";
 
@@ -34,10 +41,89 @@ type ResourceFormProps = {
   resource?: ResourceRow;
 };
 
+async function uploadPdfIfNeeded(
+  formData: FormData,
+  mode: "create" | "edit",
+): Promise<ActionResult | null> {
+  const file = formData.get("pdf");
+  const pdfFile =
+    file instanceof File && file.size > 0 ? file : null;
+
+  const pdfError = validatePdfFile(pdfFile, mode === "create");
+  if (pdfError) {
+    return { success: false, error: pdfError };
+  }
+
+  // Strip any file from FormData so PDF bytes never hit the Vercel server.
+  formData.delete("pdf");
+
+  if (!pdfFile) {
+    return null;
+  }
+
+  const title = String(formData.get("title") ?? "").trim();
+  const slugInput = String(formData.get("slug") ?? "").trim();
+  const slug = slugify(slugInput || title);
+  if (!slug) {
+    return { success: false, error: "Please fill in all required fields." };
+  }
+
+  const supabase = createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { success: false, error: "You must be signed in as an admin." };
+  }
+
+  if (!isAdminUser(user)) {
+    return {
+      success: false,
+      error: "This account is not authorized for admin access.",
+    };
+  }
+
+  const pdfPath = buildPdfObjectPath(slug);
+  const { error: uploadError } = await supabase.storage
+    .from(PDFS_BUCKET)
+    .upload(pdfPath, pdfFile, {
+      contentType: "application/pdf",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    return { success: false, error: uploadError.message };
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from(PDFS_BUCKET).getPublicUrl(pdfPath);
+
+  formData.set("pdf_path", pdfPath);
+  formData.set("pdf_url", publicUrl);
+  return null;
+}
+
 export function ResourceForm({ mode, resource }: ResourceFormProps) {
   const router = useRouter();
-  const action = mode === "create" ? createResourceAction : updateResourceAction;
-  const [state, formAction, pending] = useActionState(action, initialState);
+  const serverAction =
+    mode === "create" ? createResourceAction : updateResourceAction;
+
+  const [state, formAction, pending] = useActionState(
+    async (
+      prev: ActionResult | null,
+      formData: FormData,
+    ): Promise<ActionResult> => {
+      const uploadResult = await uploadPdfIfNeeded(formData, mode);
+      if (uploadResult) {
+        return uploadResult;
+      }
+      return serverAction(prev, formData);
+    },
+    initialState,
+  );
   const [title, setTitle] = useState(resource?.title ?? "");
   const [slug, setSlug] = useState(resource?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(Boolean(resource?.slug));
