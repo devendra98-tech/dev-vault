@@ -1,4 +1,5 @@
 import type { Resource } from "@/types/resource";
+import { normalizeCategoryKey } from "@/data/categories";
 
 export function filterResources(
   resources: Resource[],
@@ -22,11 +23,10 @@ export function filterResources(
     const matchesCategory =
       !filters?.category ||
       filters.category === "All" ||
-      resource.category.toLowerCase() === filters.category.toLowerCase() ||
-      (filters.category === "Cheat Sheets" &&
-        resource.type === "Cheat Sheet") ||
-      (filters.category === "Roadmaps" && resource.type === "Roadmap") ||
-      (filters.category === "Git" && resource.category === "Git & GitHub");
+      matchesCategoryName(resource, filters.category) ||
+      (filters.category === "Git" &&
+        normalizeCategoryKey(resource.category) ===
+          normalizeCategoryKey("Git & GitHub"));
 
     const matchesDifficulty =
       !filters?.difficulty ||
@@ -59,5 +59,21 @@ export function matchesCategoryName(
   if (categoryName === "Roadmaps") {
     return resource.type === "Roadmap";
   }
-  return resource.category.toLowerCase() === categoryName.toLowerCase();
+
+  const resourceKey = normalizeCategoryKey(resource.category);
+  const categoryKey = normalizeCategoryKey(categoryName);
+
+  if (resourceKey === categoryKey) {
+    return true;
+  }
+
+  // Legacy shorthand used in older filters
+  if (
+    categoryKey === "git" &&
+    resourceKey === normalizeCategoryKey("Git & GitHub")
+  ) {
+    return true;
+  }
+
+  return false;
 }

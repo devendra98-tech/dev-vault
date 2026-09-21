@@ -34,7 +34,7 @@ export function ResourceThumbnail({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl border border-border bg-muted",
+        "relative isolate overflow-hidden rounded-2xl border border-border bg-muted",
         compact ? "aspect-[16/10]" : "aspect-[5/3]",
         className,
       )}

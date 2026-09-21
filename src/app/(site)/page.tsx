@@ -4,13 +4,21 @@ import { FeaturedResources } from "@/components/home/featured-resources";
 import { ResourceCollection } from "@/components/home/resource-collection";
 import { WhyDevVault } from "@/components/home/why-devvault";
 import { LatestResources } from "@/components/home/latest-resources";
+import { getAllResources } from "@/data/resources";
 
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const resources = await getAllResources();
+  const catalog = resources.map((resource) => ({
+    title: resource.title,
+    slug: resource.slug,
+    category: resource.category,
+  }));
+
   return (
     <>
-      <Hero />
+      <Hero catalog={catalog} />
       <CategorySection />
       <FeaturedResources />
       <ResourceCollection />

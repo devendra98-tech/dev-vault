@@ -61,12 +61,14 @@ export function ResourceCard({
               <ArrowUpRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Link>
           </div>
-          <div className="relative min-h-[200px] border-t border-border p-4 lg:min-h-full lg:border-t-0 lg:border-l">
-            <ResourceThumbnail
-              category={resource.category}
-              title={resource.title}
-              className="h-full min-h-[220px] rounded-2xl"
-            />
+          <div className="relative min-h-[200px] overflow-hidden border-t border-border p-4 lg:min-h-full lg:border-t-0 lg:border-l">
+            <div className="h-full min-h-[220px] overflow-hidden rounded-2xl">
+              <ResourceThumbnail
+                category={resource.category}
+                title={resource.title}
+                className="h-full min-h-[220px] rounded-none border-0"
+              />
+            </div>
           </div>
         </div>
       </article>
@@ -80,13 +82,18 @@ export function ResourceCard({
         className,
       )}
     >
-      <Link href={`/resources/${resource.slug}`} className="block p-3 pb-0">
-        <ResourceThumbnail
-          category={resource.category}
-          title={resource.title}
-          compact
-          className="transition-transform duration-500 group-hover:scale-[1.02]"
-        />
+      <Link
+        href={`/resources/${resource.slug}`}
+        className="block overflow-hidden p-3 pb-0"
+      >
+        <div className="overflow-hidden rounded-2xl">
+          <ResourceThumbnail
+            category={resource.category}
+            title={resource.title}
+            compact
+            className="rounded-none border-0 transition-transform duration-500 group-hover:scale-[1.02]"
+          />
+        </div>
       </Link>
 
       <div className="flex flex-1 flex-col p-5 pt-4">

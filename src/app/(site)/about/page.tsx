@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "About",
@@ -20,7 +21,20 @@ const points = [
     title: "Follow & support the journey",
     description:
       "Follow for more tech tips, developer insights, life hacks and useful resources.",
-    href: "https://www.instagram.com/godavariabbayi_98/",
+    href: siteConfig.instagramUrl,
+  },
+] as const;
+
+const externalLinks = [
+  {
+    label: "Portfolio",
+    description: "Projects, skills, and work by the creator.",
+    href: siteConfig.portfolioUrl,
+  },
+  {
+    label: "INKZIO Store",
+    description: "Premium personalized apparel and custom prints.",
+    href: siteConfig.inkzioUrl,
   },
 ] as const;
 
@@ -39,8 +53,8 @@ export default function AboutPage() {
             Behind DevVault
           </h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-            DevVault is created by @godavariabbayi_98 — a developer and tech
-            content creator sharing practical programming tips, developer
+            DevVault is created by {siteConfig.instagramHandle} — a developer and
+            tech content creator sharing practical programming tips, developer
             insights, life hacks and useful resources.
           </p>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
@@ -48,16 +62,49 @@ export default function AboutPage() {
             to explore, learn and keep useful developer resources.
           </p>
           <a
-            href="https://www.instagram.com/godavariabbayi_98/"
+            href={siteConfig.instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-6 inline-flex text-sm font-medium text-accent transition-colors hover:text-foreground"
           >
-            Follow @godavariabbayi_98 ↗
+            Follow {siteConfig.instagramHandle} ↗
           </a>
         </section>
 
-        <p className="mt-6 text-base leading-relaxed text-muted-foreground">
+        <section className="mt-12 border-t border-border pt-10">
+          <h2 className="font-display text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+            More from the creator
+          </h2>
+          <ul className="mt-6 space-y-0 border-y border-border">
+            {externalLinks.map((link, index) => (
+              <li
+                key={link.href}
+                className="border-b border-border last:border-b-0"
+              >
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-4 py-4 transition-colors hover:text-accent"
+                >
+                  <span className="shrink-0 font-mono text-xs text-accent tabular-nums">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium text-foreground">
+                      {link.label} ↗
+                    </span>
+                    <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">
+                      {link.description}
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <p className="mt-10 text-base leading-relaxed text-muted-foreground">
           DevVault is a curated collection of developer resources, notes, cheat
           sheets and guides — designed to help you learn, reference and ship
           with clarity.

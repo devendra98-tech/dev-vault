@@ -88,11 +88,13 @@ export function ResourceDetail({ resource }: { resource: Resource }) {
         </div>
 
         <div className="overflow-hidden rounded-[1.5rem] border border-border bg-card p-3 shadow-[var(--shadow)] sm:p-4">
-          <ResourceThumbnail
-            category={resource.category}
-            title={resource.title}
-            className="min-h-[280px] rounded-[1.1rem] sm:min-h-[340px]"
-          />
+          <div className="overflow-hidden rounded-2xl">
+            <ResourceThumbnail
+              category={resource.category}
+              title={resource.title}
+              className="min-h-[280px] rounded-none border-0 sm:min-h-[340px]"
+            />
+          </div>
           <p className="mt-3 px-1 font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
             Resource preview
           </p>

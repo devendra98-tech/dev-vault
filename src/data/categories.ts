@@ -1,6 +1,18 @@
 import type { Category } from "@/types/resource";
 import { slugify } from "@/lib/utils";
 
+/**
+ * Collapse category labels for matching.
+ * "Node.js", "Nodejs", and "node-js" all become "nodejs".
+ */
+export function normalizeCategoryKey(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]/g, "");
+}
+
 export const categories: Category[] = [
   {
     id: "javascript",
@@ -85,12 +97,22 @@ export const categories: Category[] = [
 ];
 
 export function getCategoryBySlug(slug: string): Category | undefined {
-  return categories.find((category) => category.slug === slug);
+  const key = normalizeCategoryKey(slug);
+  return categories.find(
+    (category) =>
+      category.slug === slug ||
+      normalizeCategoryKey(category.slug) === key ||
+      normalizeCategoryKey(category.name) === key,
+  );
 }
 
 export function getCategoryByName(name: string): Category | undefined {
+  const key = normalizeCategoryKey(name);
   return categories.find(
-    (category) => category.name.toLowerCase() === name.toLowerCase(),
+    (category) =>
+      category.name.toLowerCase() === name.toLowerCase() ||
+      normalizeCategoryKey(category.name) === key ||
+      normalizeCategoryKey(category.slug) === key,
   );
 }
 
@@ -120,8 +142,11 @@ export function resolveCategoryBySlug(
   const staticCategory = getCategoryBySlug(slug);
   if (staticCategory) return staticCategory;
 
+  const slugKey = normalizeCategoryKey(slug);
   const match = resourceCategoryNames.find(
-    (name) => slugify(name) === slug.toLowerCase(),
+    (name) =>
+      slugify(name) === slug.toLowerCase() ||
+      normalizeCategoryKey(name) === slugKey,
   );
   return match ? categoryFromName(match) : undefined;
 }

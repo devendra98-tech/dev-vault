@@ -28,7 +28,7 @@ export function WhyDevVault() {
             Why DevVault
           </p>
           <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            Made to stay useful.
+            Everything you need. All in one place.
           </h2>
         </div>
 
