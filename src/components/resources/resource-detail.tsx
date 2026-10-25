@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Check, Download, Eye } from "lucide-react";
+import { Check, Download, Eye, ExternalLink } from "lucide-react";
 import type { Resource } from "@/types/resource";
 import { Button } from "@/components/ui/button";
-import { ResourceThumbnail } from "@/components/resources/resource-thumbnail";
+import { ResourceMedia } from "@/components/resources/resource-media";
 import { categoryFromName } from "@/data/categories";
+import { hasDownloadablePdf } from "@/lib/utils";
 
 export function ResourceDetail({ resource }: { resource: Resource }) {
   const category = categoryFromName(resource.category);
@@ -41,7 +42,7 @@ export function ResourceDetail({ resource }: { resource: Resource }) {
 
       <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
         <div>
-          <p className="font-mono text-[11px] tracking-[0.18em] text-accent uppercase">
+          <p className="text-xs font-semibold tracking-[0.16em] text-accent uppercase">
             {resource.category}
           </p>
           <h1 className="mt-3 max-w-2xl font-display text-4xl leading-[1.02] font-bold tracking-tight text-foreground sm:text-5xl">
@@ -51,49 +52,61 @@ export function ResourceDetail({ resource }: { resource: Resource }) {
             {resource.longDescription ?? resource.description}
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 border-y border-border py-4 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
+          <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 border-y border-border py-4 text-xs font-medium tracking-wide text-muted-foreground uppercase">
             {resource.pages ? <span>{resource.pages} pages</span> : null}
             <span>{resource.difficulty}</span>
             <span>{resource.type}</span>
           </div>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button asChild size="lg" className="w-full sm:w-auto">
-              <a
-                href={resource.pdfUrl}
-                download
-                aria-label={`Download ${resource.title} PDF`}
-              >
-                <Download className="size-4" />
-                Download PDF
-              </a>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="w-full sm:w-auto"
-            >
-              <a
-                href={resource.pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`View ${resource.title} PDF`}
-              >
-                <Eye className="size-4" />
-                View PDF
-              </a>
-            </Button>
+            {hasDownloadablePdf(resource.pdfUrl) ? (
+              <>
+                <Button asChild size="lg" className="w-full sm:w-auto">
+                  <a
+                    href={resource.pdfUrl}
+                    download
+                    aria-label={`Download ${resource.title} PDF`}
+                  >
+                    <Download className="size-4" />
+                    Download PDF
+                  </a>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="w-full sm:w-auto"
+                >
+                  <a
+                    href={resource.pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`View ${resource.title} PDF`}
+                  >
+                    <Eye className="size-4" />
+                    View PDF
+                  </a>
+                </Button>
+              </>
+            ) : (
+              <Button asChild size="lg" className="w-full sm:w-auto">
+                <Link href="/resources">
+                  <ExternalLink className="size-4" />
+                  Browse library
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-[1.5rem] border border-border bg-card p-3 shadow-[var(--shadow)] sm:p-4">
-          <ResourceThumbnail
-            category={resource.category}
-            title={resource.title}
-            className="min-h-[280px] rounded-[1.1rem] sm:min-h-[340px]"
+        <div className="overflow-hidden rounded-3xl border border-border bg-card p-3 shadow-[var(--shadow)] sm:p-4">
+          <ResourceMedia
+            resource={resource}
+            compact={false}
+            showBadge
+            className="rounded-2xl"
           />
-          <p className="mt-3 px-1 font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
+          <p className="mt-3 px-1 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
             Resource preview
           </p>
         </div>

@@ -1,10 +1,12 @@
 export const siteConfig = {
   name: "DevVault",
-  tagline: "Resources for Developers.",
+  tagline: "Learn to Code. One Concept at a Time.",
   description:
-    "Developer notes, guides, cheat sheets, roadmaps and practical resources.",
+    "Master JavaScript, React, Next.js, Node.js, AI, and modern development with beginner-friendly notes, practical guides, and free downloadable PDFs.",
   url: "https://devvault.app",
-  instagramUrl: "https://www.instagram.com/godavariabbayi_98/",
-  instagramHandle: "@godavariabbayi_98",
-  creator: "@godavariabbayi_98",
+  instagramUrl: "https://www.instagram.com/thegodavaricoder/",
+  instagramHandle: "@thegodavaricoder",
+  creator: "@thegodavaricoder",
+  logo: "/images/devvault-logo.png",
+  creatorPhoto: "/logos/mypic-webp.webp",
 } as const;

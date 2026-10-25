@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
+import { InstagramIcon } from "@/components/icons/instagram";
 import { siteConfig } from "@/lib/site";
 
 const footerLinks = [
@@ -9,48 +11,54 @@ const footerLinks = [
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-border">
-      <div className="container-page py-14 sm:py-20">
-        <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+    <footer className="mt-auto border-t border-border bg-card">
+      <div className="container-page py-12 sm:py-16">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <p className="font-display text-5xl leading-none font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-              DevVault
-            </p>
-            <p className="mt-4 max-w-md font-display text-xl text-muted-foreground sm:text-2xl">
-              Resources for Developers.
+            <Link href="/" className="inline-flex">
+              <BrandLogo size={40} />
+            </Link>
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
+              Making developer learning simple, visual, and accessible.
             </p>
           </div>
 
-          <nav
-            className="flex flex-wrap gap-x-6 gap-y-3 lg:justify-end"
-            aria-label="Footer"
-          >
-            {footerLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            ))}
+          <div>
+            <p className="text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+              Quick Links
+            </p>
+            <nav className="mt-4 flex flex-col gap-2.5" aria-label="Footer">
+              {footerLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+              Follow the Creator
+            </p>
             <a
               href={siteConfig.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-accent transition-colors hover:text-foreground"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-accent"
             >
-              {siteConfig.instagramHandle}
+              <InstagramIcon className="size-4" />
+              Instagram {siteConfig.instagramHandle}
             </a>
-          </nav>
+          </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 border-t border-border pt-6">
           <p className="text-xs text-muted-foreground">
-            © 2026 {siteConfig.name}. All rights reserved.
-          </p>
-          <p className="font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
-            Built for builders
+            © {new Date().getFullYear()} {siteConfig.name}. Built for developers.
           </p>
         </div>
       </div>

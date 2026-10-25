@@ -7,7 +7,7 @@ export function RelatedResources({ resources }: { resources: Resource[] }) {
   return (
     <section className="space-y-6 border-t border-border pt-12">
       <div>
-        <p className="font-mono text-[11px] tracking-[0.2em] text-muted-foreground uppercase">
+        <p className="text-xs font-semibold tracking-[0.16em] text-accent uppercase">
           Related
         </p>
         <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Syne } from "next/font/google";
+import { Geist_Mono, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const syne = Syne({
-  variable: "--font-syne",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
   weight: ["500", "600", "700", "800"],
 });
@@ -25,14 +25,11 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? siteConfig.url,
   ),
   title: {
-    default: "DevVault — Resources for Developers",
+    default: "DevVault — Free Developer Notes & Learning Guides",
     template: "%s | DevVault",
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
-  icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-  },
   keywords: [
     "developer resources",
     "programming notes",
@@ -41,9 +38,10 @@ export const metadata: Metadata = {
     "React guides",
     "interview guides",
     "developer roadmap",
+    "free PDF notes",
   ],
   authors: [{ name: siteConfig.name }],
-  creator: siteConfig.name,
+  creator: siteConfig.creator,
   robots: {
     index: true,
     follow: true,
@@ -53,12 +51,12 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: siteConfig.url,
     siteName: siteConfig.name,
-    title: "DevVault — Resources for Developers",
+    title: "DevVault — Free Developer Notes & Learning Guides",
     description: siteConfig.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: "DevVault — Resources for Developers",
+    title: "DevVault — Free Developer Notes & Learning Guides",
     description: siteConfig.description,
     creator: siteConfig.creator,
   },
@@ -76,12 +74,13 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
+      className={`${inter.variable} ${geistMono.variable} ${jakarta.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >

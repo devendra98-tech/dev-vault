@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Resource } from "@/types/resource";
 import { ResourceSearch } from "@/components/resources/resource-search";
@@ -9,6 +9,7 @@ import {
   type ResourceFiltersState,
 } from "@/components/resources/resource-filters";
 import { ResourceGrid } from "@/components/resources/resource-grid";
+import { ResourcePreviewModal } from "@/components/resources/resource-preview-modal";
 import { filterResources } from "@/lib/resources/filter";
 
 const DIFFICULTY_OPTIONS = ["Beginner", "Intermediate", "Advanced"] as const;
@@ -17,23 +18,34 @@ type ResourceExplorerProps = {
   resources: Resource[];
   initialQuery?: string;
   initialCategory?: string;
+  showAdvancedFilters?: boolean;
 };
 
 export function ResourceExplorer({
   resources,
   initialQuery = "",
   initialCategory = "All",
+  showAdvancedFilters = false,
 }: ResourceExplorerProps) {
   const searchParams = useSearchParams();
   const queryFromUrl = searchParams.get("q") ?? initialQuery;
   const categoryFromUrl = searchParams.get("category") ?? initialCategory;
 
   const [query, setQuery] = useState(queryFromUrl);
+  const [debouncedQuery, setDebouncedQuery] = useState(queryFromUrl);
+  const [preview, setPreview] = useState<Resource | null>(null);
   const [filters, setFilters] = useState<ResourceFiltersState>({
     category: categoryFromUrl,
     difficulty: "All",
     type: "All",
   });
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 250);
+    return () => window.clearTimeout(timeout);
+  }, [query]);
 
   const filterCategories = useMemo(() => {
     const unique = Array.from(
@@ -77,16 +89,16 @@ export function ResourceExplorer({
 
   const filtered = useMemo(
     () =>
-      filterResources(resources, query, {
+      filterResources(resources, debouncedQuery, {
         category: safeFilters.category,
         difficulty: safeFilters.difficulty,
         type: safeFilters.type,
       }),
-    [resources, query, safeFilters],
+    [resources, debouncedQuery, safeFilters],
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <ResourceSearch value={query} onChange={setQuery} />
       <ResourceFilters
         value={safeFilters}
@@ -94,14 +106,20 @@ export function ResourceExplorer({
         categories={filterCategories}
         difficulties={filterDifficulties}
         types={filterTypes}
+        showAdvanced={showAdvancedFilters}
       />
       <p
-        className="font-mono text-[11px] tracking-wide text-muted-foreground uppercase"
+        className="text-sm text-muted-foreground"
         aria-live="polite"
       >
-        {filtered.length} resource{filtered.length === 1 ? "" : "s"} found
+        Showing {filtered.length} of {resources.length}{" "}
+        {resources.length === 1 ? "resource" : "resources"}
       </p>
-      <ResourceGrid resources={filtered} />
+      <ResourceGrid resources={filtered} onPreview={setPreview} />
+      <ResourcePreviewModal
+        resource={preview}
+        onClose={() => setPreview(null)}
+      />
     </div>
   );
 }

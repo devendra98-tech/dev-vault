@@ -104,6 +104,7 @@ export async function createResourceAction(
     const publishedAt = String(formData.get("publishedAt") ?? "").trim();
     const tags = parseList(formData.get("tags"));
     const highlights = parseList(formData.get("highlights"));
+    const thumbnail = String(formData.get("thumbnail") ?? "").trim();
     const file = formData.get("pdf") as File | null;
 
     if (!title || !description || !category || !difficulty || !type || !slug) {
@@ -146,6 +147,7 @@ export async function createResourceAction(
       publishedAt: publishedAt || undefined,
       tags,
       highlights,
+      thumbnail: thumbnail || undefined,
       pdfUrl: publicUrl,
       pdfPath,
     });
@@ -207,6 +209,7 @@ export async function updateResourceAction(
     const publishedAt = String(formData.get("publishedAt") ?? "").trim();
     const tags = parseList(formData.get("tags"));
     const highlights = parseList(formData.get("highlights"));
+    const thumbnail = String(formData.get("thumbnail") ?? "").trim();
     const file = formData.get("pdf") as File | null;
 
     if (!title || !description || !category || !difficulty || !type || !slug) {
@@ -261,6 +264,7 @@ export async function updateResourceAction(
       publishedAt: publishedAt || existing.published_at,
       tags,
       highlights,
+      thumbnail: thumbnail || undefined,
       pdfUrl,
       pdfPath,
     });

@@ -21,3 +21,13 @@ export function formatDate(date: string): string {
     year: "numeric",
   }).format(new Date(date));
 }
+
+export function isRecentResource(publishedAt: string, days = 21): boolean {
+  const date = new Date(publishedAt);
+  if (Number.isNaN(date.getTime())) return false;
+  return Date.now() - date.getTime() <= days * 24 * 60 * 60 * 1000;
+}
+
+export function hasDownloadablePdf(pdfUrl?: string): boolean {
+  return Boolean(pdfUrl && pdfUrl.trim());
+}

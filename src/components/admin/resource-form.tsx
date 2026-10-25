@@ -8,6 +8,11 @@ import {
   type ActionResult,
 } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
+import { ResourceThumbnail } from "@/components/resources/resource-thumbnail";
+import {
+  hasCustomThumbnail,
+  resolveThumbnailTheme,
+} from "@/lib/resources/thumbnail-theme";
 import { slugify } from "@/lib/utils";
 import type { ResourceRow } from "@/lib/resources/types";
 
@@ -41,6 +46,18 @@ export function ResourceForm({ mode, resource }: ResourceFormProps) {
   const [title, setTitle] = useState(resource?.title ?? "");
   const [slug, setSlug] = useState(resource?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(Boolean(resource?.slug));
+  const [category, setCategory] = useState(resource?.category ?? "");
+  const [type, setType] = useState(resource?.type ?? "PDF");
+  const [thumbnail, setThumbnail] = useState(() => {
+    const value = resource?.thumbnail?.trim() ?? "";
+    return hasCustomThumbnail(value) ? value : "";
+  });
+  const autoTheme = resolveThumbnailTheme({
+    title,
+    category,
+    type,
+    slug,
+  });
 
   useEffect(() => {
     if (mode === "edit" && state.success) {
@@ -110,7 +127,8 @@ export function ResourceForm({ mode, resource }: ResourceFormProps) {
             name="category"
             type="text"
             required
-            defaultValue={resource?.category ?? ""}
+            value={category}
+            onChange={(event) => setCategory(event.target.value)}
             placeholder="e.g. JavaScript, Python, AWS, Docker"
             className={inputClass}
           />
@@ -120,7 +138,8 @@ export function ResourceForm({ mode, resource }: ResourceFormProps) {
             id="type"
             name="type"
             required
-            defaultValue={resource?.type ?? "PDF"}
+            value={type}
+            onChange={(event) => setType(event.target.value)}
             className={inputClass}
           >
             {types.map((type) => (
@@ -192,6 +211,49 @@ export function ResourceForm({ mode, resource }: ResourceFormProps) {
           defaultValue={(resource?.highlights ?? []).join("\n")}
           className={textareaClass}
         />
+      </Field>
+
+      <Field
+        label="Custom thumbnail URL (optional)"
+        htmlFor="thumbnail"
+      >
+        <input
+          id="thumbnail"
+          name="thumbnail"
+          type="text"
+          value={thumbnail}
+          onChange={(event) => setThumbnail(event.target.value)}
+          placeholder="https://…"
+          className={inputClass}
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Leave blank to auto-generate a topic thumbnail from the title and
+          category. A custom image is used only when this URL is set.
+        </p>
+        <div className="mt-3 overflow-hidden rounded-2xl border border-border">
+          {hasCustomThumbnail(thumbnail) ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={thumbnail.trim()}
+              alt=""
+              className="aspect-video w-full object-cover"
+            />
+          ) : (
+            <ResourceThumbnail
+              title={title || "Resource title"}
+              category={category || "Category"}
+              type={type}
+              slug={slug}
+              showBadge
+              showCaption
+            />
+          )}
+        </div>
+        {!hasCustomThumbnail(thumbnail) ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Auto theme: {autoTheme.label}
+          </p>
+        ) : null}
       </Field>
 
       <Field

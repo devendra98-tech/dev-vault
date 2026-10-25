@@ -1,159 +1,72 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
-import { useState, type FormEvent, type KeyboardEvent } from "react";
+import Link from "next/link";
+import { BookOpen } from "lucide-react";
+import { InstagramIcon } from "@/components/icons/instagram";
 import { Button } from "@/components/ui/button";
+import { siteConfig } from "@/lib/site";
 
-const suggestions = [
-  "JavaScript",
-  "React",
-  "Next.js",
-  "TypeScript",
-  "Git",
+const topics = [
+  { label: "JavaScript", className: "top-10 left-[4%] hidden lg:flex" },
+  { label: "React", className: "top-24 right-[6%] hidden lg:flex" },
+  { label: "Next.js", className: "bottom-28 left-[8%] hidden md:flex" },
+  { label: "Node.js", className: "bottom-16 right-[10%] hidden md:flex" },
+  { label: "AI & Machine Learning", className: "top-1/2 right-[2%] hidden xl:flex" },
+  { label: "Git & GitHub", className: "top-1/2 left-[1%] hidden xl:flex" },
 ];
 
 export function Hero() {
-  const router = useRouter();
-  const [query, setQuery] = useState("");
-
-  function goSearch(value?: string) {
-    const trimmed = (value ?? query).trim();
-    router.push(
-      trimmed
-        ? `/resources?q=${encodeURIComponent(trimmed)}`
-        : "/resources",
-    );
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    goSearch();
-  }
-
-  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-      event.preventDefault();
-      goSearch();
-    }
-  }
-
   return (
     <section className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 hero-mesh" aria-hidden="true" />
 
-      <div className="container-page relative grid items-center gap-10 py-10 sm:py-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:py-16">
-        <div className="reveal max-w-xl">
-          <p className="font-mono text-[11px] tracking-[0.22em] text-accent uppercase">
-            Developer Resource Library
-          </p>
-          <h1 className="mt-4 font-display text-[2.6rem] leading-[0.95] font-bold tracking-tight text-foreground sm:text-5xl lg:text-[3.75rem]">
-            Resources
-            <br />
-            for Developers.
-          </h1>
-          <p className="mt-5 max-w-md text-[15px] leading-relaxed text-muted-foreground sm:text-base">
-            Notes, guides, cheat sheets and practical resources for building
-            better software.
-          </p>
-
-          <form onSubmit={handleSubmit} className="mt-8">
-            <label htmlFor="hero-search" className="sr-only">
-              Search resources
-            </label>
-            <div className="group flex items-center gap-3 rounded-2xl border border-border-strong bg-card px-4 py-3 shadow-[var(--shadow)] transition-shadow duration-200 focus-within:border-accent/50 focus-within:shadow-[var(--shadow-hover)]">
-              <Search
-                className="size-4 shrink-0 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <input
-                id="hero-search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Search resources..."
-                className="min-w-0 flex-1 bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
-                autoComplete="off"
-                spellCheck={false}
-              />
-              <kbd className="hidden items-center gap-1 rounded-md border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline-flex">
-                ⌘K
-              </kbd>
-            </div>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="text-xs text-muted-foreground">Try</span>
-              {suggestions.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => goSearch(item)}
-                  className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-accent/40 hover:text-foreground"
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-            <Button type="submit" className="mt-5 w-full sm:hidden">
-              Search library
-            </Button>
-          </form>
-        </div>
-
-        <div
-          className="relative mx-auto hidden h-[360px] w-full max-w-md lg:block xl:h-[400px] xl:max-w-lg"
-          aria-hidden="true"
+      {topics.map((topic) => (
+        <span
+          key={topic.label}
+          className={`absolute z-0 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm ${topic.className}`}
         >
-          <div className="absolute top-4 left-2 float-a rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-hover)] sm:w-56">
-            <p className="font-mono text-[10px] tracking-wider text-accent uppercase">
-              JavaScript
-            </p>
-            <p className="mt-2 font-display text-lg leading-tight font-semibold">
-              Complete Notes
-            </p>
-            <p className="mt-2 text-xs text-muted-foreground">42 pages</p>
-          </div>
-          <div className="absolute top-28 right-0 float-b rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-hover)] sm:w-60">
-            <p className="font-mono text-[10px] tracking-wider text-accent uppercase">
-              React
-            </p>
-            <p className="mt-2 font-display text-lg leading-tight font-semibold">
-              Interview Guide
-            </p>
-            <p className="mt-2 text-xs text-muted-foreground">24 pages</p>
-          </div>
-          <div className="absolute bottom-6 left-10 float-c rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-hover)] sm:w-52">
-            <p className="font-mono text-[10px] tracking-wider text-accent uppercase">
-              Git
-            </p>
-            <p className="mt-2 font-display text-lg leading-tight font-semibold">
-              Cheat Sheet
-            </p>
-            <p className="mt-2 text-xs text-muted-foreground">Quick reference</p>
-          </div>
-          <div className="absolute top-1/2 left-1/2 size-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--hero-glow),transparent_70%)] blur-2xl" />
-        </div>
+          {topic.label}
+        </span>
+      ))}
 
-        {/* Mobile compact visual strip */}
-        <div className="flex gap-3 overflow-x-auto pb-1 lg:hidden" aria-hidden="true">
-          {[
-            { cat: "JS", title: "Complete Notes" },
-            { cat: "React", title: "Interview Guide" },
-            { cat: "Git", title: "Cheat Sheet" },
-          ].map((card) => (
-            <div
-              key={card.cat}
-              className="min-w-[140px] shrink-0 rounded-2xl border border-border bg-card p-3 shadow-[var(--shadow)]"
-            >
-              <p className="font-mono text-[10px] text-accent uppercase">
-                {card.cat}
-              </p>
-              <p className="mt-1 font-display text-sm font-semibold">{card.title}</p>
-            </div>
-          ))}
+      <div className="container-page relative z-10 py-14 text-center sm:py-20 lg:py-24">
+        <div className="reveal mx-auto max-w-3xl">
+          <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-muted-foreground shadow-sm">
+            <span aria-hidden="true">📸</span>
+            {siteConfig.instagramHandle} · Free Developer Notes
+          </p>
+
+          <h1 className="mt-6 font-display text-4xl leading-[1.05] font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+            Learn to Code.{" "}
+            <span className="bg-linear-to-r from-accent to-accent-hover bg-clip-text text-transparent">
+              One Concept at a Time.
+            </span>
+          </h1>
+
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Master JavaScript, React, Next.js, Node.js, AI, and modern
+            development with beginner-friendly notes, practical guides, and free
+            downloadable PDFs.
+          </p>
+
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button asChild size="lg">
+              <Link href="/#notes">
+                <BookOpen className="size-4" />
+                Explore Free Notes
+              </Link>
+            </Button>
+            <Button asChild variant="navy" size="lg">
+              <a
+                href={siteConfig.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <InstagramIcon className="size-4" />
+                Follow on Instagram
+              </a>
+            </Button>
+          </div>
         </div>
       </div>
-
-      <div className="hairline" />
     </section>
   );
 }

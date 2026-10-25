@@ -1,21 +1,22 @@
 import { Hero } from "@/components/home/hero";
-import { CategorySection } from "@/components/home/category-section";
-import { FeaturedResources } from "@/components/home/featured-resources";
-import { ResourceCollection } from "@/components/home/resource-collection";
-import { WhyDevVault } from "@/components/home/why-devvault";
-import { LatestResources } from "@/components/home/latest-resources";
+import { StatsSection } from "@/components/home/stats-section";
+import { ResourceLibrary } from "@/components/home/resource-library";
+import { AboutCreator } from "@/components/home/about-creator";
+import { FinalCta } from "@/components/home/final-cta";
+import { getAllResources } from "@/data/resources";
 
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const resources = await getAllResources();
+
   return (
     <>
       <Hero />
-      <CategorySection />
-      <FeaturedResources />
-      <ResourceCollection />
-      <WhyDevVault />
-      <LatestResources />
+      <StatsSection resources={resources} />
+      <ResourceLibrary resources={resources} />
+      <AboutCreator />
+      <FinalCta />
     </>
   );
 }

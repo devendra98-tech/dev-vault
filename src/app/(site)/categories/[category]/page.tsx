@@ -56,7 +56,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   return (
     <div className="container-page py-10 sm:py-16">
       <div className="mb-10 max-w-2xl border-b border-border pb-8">
-        <p className="font-mono text-[11px] tracking-[0.2em] text-muted-foreground uppercase">
+        <p className="text-xs font-semibold tracking-[0.16em] text-accent uppercase">
           Category
         </p>
         <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
@@ -65,13 +65,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
           {category.description}
         </p>
-        <p className="mt-4 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
+        <p className="mt-4 text-sm text-muted-foreground">
           {count} resource{count === 1 ? "" : "s"}
         </p>
       </div>
 
       {resources.length === 0 ? (
-        <div className="rounded-[1.5rem] border border-dashed border-border-strong px-6 py-20 text-center">
+        <div className="rounded-2xl border border-dashed border-border-strong px-6 py-20 text-center">
           <h2 className="font-display text-2xl font-bold text-foreground">
             No resources available in this category yet.
           </h2>

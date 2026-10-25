@@ -15,7 +15,7 @@ type ResourceSearchProps = {
 export function ResourceSearch({
   value,
   onChange,
-  placeholder = "Search the library...",
+  placeholder = "Search JavaScript, React, Next.js, Node.js, AI...",
   className,
   autoFocus,
   id = "resource-search",
@@ -35,7 +35,7 @@ export function ResourceSearch({
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         autoFocus={autoFocus}
-        className="h-12 w-full rounded-2xl border border-border-strong bg-card pr-11 pl-11 text-[15px] text-foreground shadow-[var(--shadow)] outline-none transition-shadow placeholder:text-muted-foreground focus:border-accent/40 focus:shadow-[var(--shadow-hover)] sm:h-14 sm:text-sm"
+        className="h-12 w-full rounded-full border border-border bg-card pr-11 pl-11 text-[15px] text-foreground shadow-sm outline-none transition-shadow placeholder:text-muted-foreground focus:border-accent/50 focus:shadow-[var(--shadow)] sm:h-14 sm:text-sm"
         autoComplete="off"
         spellCheck={false}
       />

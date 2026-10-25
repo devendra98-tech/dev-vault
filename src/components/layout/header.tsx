@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { InstagramIcon } from "@/components/icons/instagram";
 import { useEffect, useState } from "react";
+import { BrandLogo } from "@/components/brand-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -33,103 +35,106 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
-      <div className="container-page !px-0">
-        <div className="flex h-14 items-center justify-between gap-3 rounded-full border border-border/80 bg-[var(--nav-bg)] px-3 shadow-[var(--shadow)] backdrop-blur-xl sm:h-16 sm:px-4">
-          <Link
-            href="/"
-            className="group flex items-center gap-2.5 pl-1"
-            onClick={() => setOpen(false)}
-          >
-            <span className="flex size-8 items-center justify-center rounded-full bg-ink font-display text-sm font-bold text-paper transition-transform duration-200 group-hover:scale-105 dark:bg-foreground dark:text-background">
-              D
-            </span>
-            <span className="font-display text-[15px] font-semibold tracking-tight text-foreground sm:text-base">
-              {siteConfig.name}
-            </span>
-          </Link>
+    <header className="sticky top-0 z-50 border-b border-border bg-[var(--nav-bg)] backdrop-blur-xl">
+      <div className="container-page grid h-16 grid-cols-[auto_1fr_auto] items-center gap-3 md:grid-cols-[1fr_auto_1fr]">
+        <Link
+          href="/"
+          className="group flex items-center gap-2.5 justify-self-start"
+          onClick={() => setOpen(false)}
+        >
+          <BrandLogo size={40} />
+        </Link>
 
-          <nav
-            className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex"
-            aria-label="Primary"
-          >
-            {navLinks.map((link) => {
-              const active =
-                link.label === "Categories"
-                  ? pathname.startsWith("/categories")
-                  : pathname === link.href ||
-                    (link.href !== "/" && pathname.startsWith(link.href));
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    "relative rounded-full px-3.5 py-2 text-sm transition-colors",
-                    active
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {link.label}
-                  {active ? (
-                    <span className="absolute inset-x-3 -bottom-0.5 h-px bg-accent" />
-                  ) : null}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="flex items-center gap-0.5">
-            <Button
-              asChild
-              variant="ghost"
-              size="icon-sm"
-              aria-label="Search resources"
-            >
-              <Link href="/resources">
-                <Search className="size-4" />
+        <nav
+          className="hidden items-center justify-center gap-1 md:flex"
+          aria-label="Primary"
+        >
+          {navLinks.map((link) => {
+            const active =
+              link.label === "Categories"
+                ? pathname.startsWith("/categories")
+                : pathname === link.href ||
+                  (link.href !== "/" && pathname.startsWith(link.href));
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "relative rounded-full px-3.5 py-2 text-sm font-medium transition-colors",
+                  active
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {link.label}
+                {active ? (
+                  <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-accent" />
+                ) : null}
               </Link>
-            </Button>
-            <ThemeToggle />
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="md:hidden"
-              aria-label={open ? "Close menu" : "Open menu"}
-              aria-expanded={open}
-              onClick={() => setOpen((value) => !value)}
-            >
-              {open ? <X className="size-4" /> : <Menu className="size-4" />}
-            </Button>
-          </div>
+            );
+          })}
+        </nav>
+
+        <div className="flex items-center justify-end gap-2">
+          <a
+            href={siteConfig.instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:inline-flex"
+          >
+            <InstagramIcon className="size-4" />
+            {siteConfig.instagramHandle}
+          </a>
+          <ThemeToggle />
+          <Button asChild size="sm" className="hidden sm:inline-flex">
+            <Link href="/#notes">Explore Notes</Link>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="md:hidden"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            onClick={() => setOpen((value) => !value)}
+          >
+            {open ? <X className="size-4" /> : <Menu className="size-4" />}
+          </Button>
         </div>
       </div>
 
       {open ? (
-        <div className="container-page !px-0 pt-2 md:hidden">
-          <nav
-            className="rounded-3xl border border-border bg-card p-2 shadow-[var(--shadow)]"
-            aria-label="Mobile"
-          >
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="block rounded-2xl px-4 py-3.5 text-sm font-medium text-foreground hover:bg-muted"
-                onClick={() => setOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
+        <nav
+          className="border-t border-border bg-card px-4 py-3 md:hidden"
+          aria-label="Mobile"
+        >
+          {navLinks.map((link) => (
             <Link
-              href="/resources"
-              className="mt-1 block rounded-2xl bg-ink px-4 py-3.5 text-center text-sm font-medium text-paper dark:bg-foreground dark:text-background"
+              key={link.href}
+              href={link.href}
+              className="block rounded-xl px-3 py-3 text-sm font-medium text-foreground hover:bg-muted"
               onClick={() => setOpen(false)}
             >
-              Browse library
+              {link.label}
             </Link>
-          </nav>
-        </div>
+          ))}
+          <a
+            href={siteConfig.instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 rounded-xl px-3 py-3 text-sm font-medium text-foreground hover:bg-muted"
+            onClick={() => setOpen(false)}
+          >
+            <InstagramIcon className="size-4" />
+            {siteConfig.instagramHandle}
+          </a>
+          <Link
+            href="/#notes"
+            className="mt-1 block rounded-full bg-accent px-4 py-3 text-center text-sm font-semibold text-accent-foreground"
+            onClick={() => setOpen(false)}
+          >
+            Explore Notes
+          </Link>
+        </nav>
       ) : null}
     </header>
   );
