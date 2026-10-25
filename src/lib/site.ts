@@ -9,4 +9,6 @@ export const siteConfig = {
   creator: "@thegodavaricoder",
   logo: "/images/devvault-logo.png",
   creatorPhoto: "/logos/mypic-webp.webp",
+  portfolioUrl: "https://devendra98-tech.github.io/my-portfolio/",
+  inkzioUrl: "https://www.inkzio.store/",
 } as const;

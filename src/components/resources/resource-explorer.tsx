@@ -87,6 +87,16 @@ export function ResourceExplorer({
     return { category, difficulty, type };
   }, [filters, filterCategories, filterDifficulties, filterTypes]);
 
+  const catalog = useMemo(
+    () =>
+      resources.map((resource) => ({
+        title: resource.title,
+        slug: resource.slug,
+        category: resource.category,
+      })),
+    [resources],
+  );
+
   const filtered = useMemo(
     () =>
       filterResources(resources, debouncedQuery, {
@@ -99,7 +109,7 @@ export function ResourceExplorer({
 
   return (
     <div className="space-y-6">
-      <ResourceSearch value={query} onChange={setQuery} />
+      <ResourceSearch value={query} onChange={setQuery} catalog={catalog} />
       <ResourceFilters
         value={safeFilters}
         onChange={setFilters}

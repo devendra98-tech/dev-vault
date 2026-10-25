@@ -16,7 +16,10 @@ const topics = [
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 hero-mesh" aria-hidden="true" />
+      <div
+        className="pointer-events-none absolute inset-0 hero-mesh"
+        aria-hidden="true"
+      />
 
       {topics.map((topic) => (
         <span

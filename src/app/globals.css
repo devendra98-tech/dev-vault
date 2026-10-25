@@ -108,9 +108,48 @@ body {
   color: var(--foreground);
 }
 
-:focus-visible {
+/* Keyboard focus ring for links/buttons — not text fields
+   (inputs use their own border/ring styles to avoid a box-in-box look). */
+:focus-visible:not(input):not(textarea):not(select) {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--foreground) 6%, transparent),
+    transparent
+  );
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

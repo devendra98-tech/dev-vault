@@ -1,4 +1,4 @@
-import { categories, categoryFromName } from "@/data/categories";
+import { categories, categoryFromName, normalizeCategoryKey } from "@/data/categories";
 import { seedResources } from "@/data/seed-resources";
 import {
   matchesCategoryName,
@@ -118,14 +118,14 @@ export async function getCategoriesWithCounts() {
     ).length,
   }));
 
-  const knownNames = new Set(
-    categories.map((category) => category.name.toLowerCase()),
+  const knownKeys = new Set(
+    categories.map((category) => normalizeCategoryKey(category.name)),
   );
 
   const dynamicNames = Array.from(
     new Set(resources.map((resource) => resource.category.trim()).filter(Boolean)),
   )
-    .filter((name) => !knownNames.has(name.toLowerCase()))
+    .filter((name) => !knownKeys.has(normalizeCategoryKey(name)))
     .sort((a, b) => a.localeCompare(b));
 
   const dynamicWithCounts = dynamicNames.map((name) => {
